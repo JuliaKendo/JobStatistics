@@ -11,7 +11,6 @@ def get_url(url_template, params):
 def query_to_site(Url, Params, Headers=None):
     try:
         if Headers:
-            logging.info(u'{0}'.format(Headers['X-Api-App-Id']))
             responce = requests.get(Url, headers=Headers, params=Params)
         else:
             responce = requests.get(Url, params=Params)
