@@ -125,5 +125,5 @@ dmypy.json
 .pyre/
 
 # Adding
-.DS_Store
+/.DS_Store
 Log.txt
