@@ -15,17 +15,17 @@ def get_total_sj_pages(total_jobs_offers):
 
 def get_total_sj_jobs(url_template, params):
     url = service.get_url(url_template)
-    responce_from_site = service.query_to_site(url, params, url_header)
-    return responce_from_site.get('total',0) if responce_from_site else 0    
+    response_from_site = service.query_to_site(url, params, url_header)
+    return response_from_site.get('total',0) if response_from_site else 0    
 
 def predict_rub_salary_sj(url_template, params):
     predict_rub_salary = {'total_processed':0,'average_salary':0}
     url = service.get_url(url_template)
-    responce_from_site = service.query_to_site(url, params, url_header)
-    if not responce_from_site:
+    response_from_site = service.query_to_site(url, params, url_header)
+    if not response_from_site:
         return predict_rub_salary
         
-    for item in responce_from_site['objects']:
+    for item in response_from_site['objects']:
         average_salary = service.average_salary(item['currency'],item['payment_from'],item['payment_to'])
         if average_salary:
              predict_rub_salary['total_processed'] += 1

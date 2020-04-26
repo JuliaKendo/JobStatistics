@@ -2,24 +2,24 @@ import service_for_getting_jobs as service
 
 def get_total_hh_pages(url_template, params):
     url = service.get_url(url_template)
-    responce_from_site = service.query_to_site(url, params)
-    return responce_from_site.get('pages',0) if responce_from_site else 0
+    response_from_site = service.query_to_site(url, params)
+    return response_from_site.get('pages',0) if response_from_site else 0
 
 def get_total_hh_jobs(url_template, params):
     url = service.get_url(url_template)
-    responce_from_site = service.query_to_site(url, params)
-    return responce_from_site.get('found',0) if responce_from_site else 0
+    response_from_site = service.query_to_site(url, params)
+    return response_from_site.get('found',0) if response_from_site else 0
 
 def predict_rub_salary_hh(url_template, params):
     predict_rub_salary = {'total_processed':0,'average_salary':0}
     params['only_with_salary'] = True
     params['currency'] = 'RUR'
     url = service.get_url(url_template)
-    responce_from_site = service.query_to_site(url, params)
-    if not responce_from_site:
+    response_from_site = service.query_to_site(url, params)
+    if not response_from_site:
         return predict_rub_salary
 
-    for item in responce_from_site['items']:
+    for item in response_from_site['items']:
         salary = item['salary']
         average_salary = service.average_salary(salary['currency'],salary['from'],salary['to'])
         if average_salary:

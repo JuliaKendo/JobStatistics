@@ -10,12 +10,12 @@ def get_url(url_template):
 
 def query_to_site(url, params, headers=None):
     try:
-        responce = requests.get(url, headers=headers or {}, params=params)
+        response = requests.get(url, headers=headers or {}, params=params)
     except requests.exceptions.HTTPError as error:
         logging.error(u'Ошибка получения данных по ссылке {0}:\n{1}'.format(url, error))
         return
-    responce.raise_for_status()
-    return responce.json()
+    response.raise_for_status()
+    return response.json()
 
 def add_keywords(params, prog_language, num_of_keyword):
     keywords_template = 'keywords[{0}][{1}]'
