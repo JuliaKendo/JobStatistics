@@ -4,38 +4,35 @@ import logging
 PROG_LANGUAGES = ['Python', 'Java', 'JavaScript', 'Go', 'PHP', 'C++', '1C']
 logging.basicConfig(level = logging.DEBUG, filename = u'log.txt')
 
-def get_url(url_template, params):
+def get_url(url_template):
     url = 'https://{0}'.format(url_template)
     return url
 
-def query_to_site(Url, Params, Headers=None):
+def query_to_site(url, params, headers=None):
     try:
-        if Headers:
-            responce = requests.get(Url, headers=Headers, params=Params)
-        else:
-            responce = requests.get(Url, params=Params)
+        responce = requests.get(url, headers=headers or {}, params=params)
     except requests.exceptions.HTTPError as error:
-        logging.error(u'Ошибка получения данных по ссылке {0}:\n{1}'.format(Url, error))
-        return {}
+        logging.error(u'Ошибка получения данных по ссылке {0}:\n{1}'.format(url, error))
+        return
     responce.raise_for_status()
     return responce.json()
 
 def add_keywords(params, prog_language, num_of_keyword):
     keywords_template = 'keywords[{0}][{1}]'
-
-    for key, param in {'srws':1,'skwc':'and','keys':prog_language}.items():
+    keywords_params = {'srws':1,'skwc':'and','keys':prog_language}
+    for key, param in keywords_params.items():
         params[keywords_template.format(num_of_keyword, key)] = param
 
-def average_salary(Currency, From, To):
-    if Currency != 'RUR' and Currency != 'rub':
+def average_salary(currency, salary_from, salary_to):
+    if currency != 'RUR' and currency != 'rub':
         return None
     try:
-        if From > 0 and To > 0:
-            return (From + To) / 2
-        elif From > 0 and not To:
-            return From * 1.2
-        elif not From and To > 0:
-            return To * 0.8
+        if salary_from > 0 and salary_to > 0:
+            return (salary_from + salary_to) / 2
+        elif salary_from > 0 and not salary_to:
+            return salary_from * 1.2
+        elif not salary_from and salary_to > 0:
+            return salary_to * 0.8
         else:
             return 0
     except:
