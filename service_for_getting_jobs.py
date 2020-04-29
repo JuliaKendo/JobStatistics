@@ -9,6 +9,7 @@ def get_url(url_template):
     return url
 
 def query_to_site(url, params, headers=None):
+    logger.info('Запрос к сайту')
     response = requests.get(url, headers=headers or {}, params=params)
     response.raise_for_status()
     return response.json()

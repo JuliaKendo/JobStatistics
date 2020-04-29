@@ -8,6 +8,18 @@ from terminaltables import AsciiTable
 
 logger = logging.getLogger('statistics')
 
+class SaveLogHandler(logging.Handler):
+
+    def __init__(self, filename):
+        super().__init__()
+        self.filename = filename
+        self.formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+
+    def emit(self, record):
+        log_entry = self.format(record)+'\n'
+        with open(self.filename, 'a') as logfile:
+            logfile.write(log_entry)
+
 def initialize_logger():
     output_dir = os.path.dirname(os.path.realpath(__file__))
     logger.setLevel(logging.DEBUG)
@@ -32,7 +44,9 @@ def show_jobs_statistics(function_jobs_statistics, title):
 def main():
 
     load_dotenv()
-    initialize_logger()
+    logger = logging.getLogger('statistics')
+    logger.setLevel(logging.DEBUG)
+    logger.addHandler(SaveLogHandler('log.txt'))
     show_jobs_statistics(hh.jobs_from_hh, 'HeadHunter Moscow')
     show_jobs_statistics(sj.jobs_from_sj, 'SuperJob Moscow')
 
