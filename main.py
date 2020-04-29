@@ -20,16 +20,6 @@ class SaveLogHandler(logging.Handler):
         with open(self.filename, 'a') as logfile:
             logfile.write(log_entry)
 
-def initialize_logger():
-    output_dir = os.path.dirname(os.path.realpath(__file__))
-    logger.setLevel(logging.DEBUG)
-     
-    handler = logging.FileHandler(os.path.join(output_dir, 'log.txt'),"a")
-    handler.setLevel(logging.DEBUG)
-    formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
-
 def show_jobs_statistics(function_jobs_statistics, title):
     try:
         jobs_statistics = function_jobs_statistics()
@@ -44,7 +34,6 @@ def show_jobs_statistics(function_jobs_statistics, title):
 def main():
 
     load_dotenv()
-    logger = logging.getLogger('statistics')
     logger.setLevel(logging.DEBUG)
     logger.addHandler(SaveLogHandler('log.txt'))
     show_jobs_statistics(hh.jobs_from_hh, 'HeadHunter Moscow')
