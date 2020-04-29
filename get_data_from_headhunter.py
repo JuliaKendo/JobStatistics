@@ -1,4 +1,7 @@
 import service_for_getting_jobs as service
+import logging
+
+logger = logging.getLogger('statistics')
 
 def get_total_hh_pages(url_template, params):
     url = service.get_url(url_template)
@@ -20,8 +23,13 @@ def predict_rub_salary_hh(url_template, params):
         return predict_rub_salary
 
     for item in response_from_site['items']:
+        average_salary = None
         salary = item['salary']
-        average_salary = service.average_salary(salary['currency'],salary['from'],salary['to'])
+        try:
+            average_salary = service.get_average_salary(salary['currency'],salary['from'],salary['to'])
+        except TypeError as error:
+            logger.error('Ошибка получения усредненной зарплаты с сайта Head Hunter')
+
         if average_salary:
             predict_rub_salary['total_processed'] += 1
             predict_rub_salary['average_salary'] += average_salary
