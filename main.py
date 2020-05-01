@@ -33,8 +33,8 @@ def main():
 
     load_dotenv()
     initialize_logger()
-    show_jobs_statistics(hh.jobs_from_hh, 'HeadHunter Moscow')
-    show_jobs_statistics(sj.jobs_from_sj, 'SuperJob Moscow')
+    show_jobs_statistics(hh.get_vacancies_from_hh, 'HeadHunter Moscow')
+    show_jobs_statistics(sj.get_vacancies_from_sj, 'SuperJob Moscow')
 
 if __name__=='__main__':
     main()

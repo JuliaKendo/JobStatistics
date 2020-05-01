@@ -19,7 +19,7 @@ def add_keywords(params, prog_language, num_of_keyword):
     for key, param in keywords_params.items():
         params[keywords_template.format(num_of_keyword, key)] = param
 
-def get_average_salary(currency, salary_from, salary_to):
+def get_predicted_salary(currency, salary_from, salary_to):
     if currency != 'RUR' and currency != 'rub':
         return None
     if int(salary_from or 0) > 0 and not salary_to:
