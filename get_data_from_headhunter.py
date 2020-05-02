@@ -1,65 +1,43 @@
 import service_for_getting_jobs as service
-import logging
+from itertools import count
 
-logger = logging.getLogger('statistics')
+def read_vacancies_from_hh():
+    vacancies_from_hh = {}
+    url_template = 'api.hh.ru/vacancies'
+    
+    for language_num, prog_language in enumerate(service.PROG_LANGUAGES):
+        salaries = []
+        params = {'area':1,'only_with_salary':True,'currency':'RUR','text':'Программист And {0}'.format(prog_language)}
+        for page in count(0):
+            params['page'] = page
+            url = service.get_url(url_template)
+            response_from_site = service.query_to_site(url, params)
+            if response_from_site:
+                for item in response_from_site['items']:
+                    info_salary = item['salary']
+                    salaries.append({'from':info_salary['from'],'to':info_salary['to'],'currency':info_salary['currency']})
+                if page==response_from_site['pages']:
+                    break
+        vacancies_from_hh[prog_language] = salaries
 
-def get_total_hh_pages(url_template, params):
-    url = service.get_url(url_template)
-    response_from_site = service.query_to_site(url, params)
-    return response_from_site.get('pages',0) if response_from_site else 0
-
-def get_total_hh_jobs(url_template, params):
-    url = service.get_url(url_template)
-    response_from_site = service.query_to_site(url, params)
-    return response_from_site.get('found',0) if response_from_site else 0
-
-def predict_rub_salary_from_hh(url_template, params):
-    predict_rub_salary = {'total_processed_vacancies':0,'total_predicted_salary':0}
-    params['only_with_salary'] = True
-    params['currency'] = 'RUR'
-    url = service.get_url(url_template)
-    response_from_site = service.query_to_site(url, params)
-    if not response_from_site:
-        return predict_rub_salary
-
-    for item in response_from_site['items']:
-        predicted_salary = None
-        salary = item['salary']
-        try:
-            predicted_salary = service.get_predicted_salary(salary['currency'],salary['from'],salary['to'])
-        except TypeError as error:
-            logger.error('Ошибка получения усредненной зарплаты с сайта Head Hunter')
-
-        if predicted_salary:
-            predict_rub_salary['total_processed_vacancies'] += 1
-            predict_rub_salary['total_predicted_salary'] += predicted_salary
-
-    return predict_rub_salary
+    return vacancies_from_hh    
 
 def get_vacancies_from_hh():
     headhunter_jobs_statistics = []
-    url_template = 'api.hh.ru/vacancies'
-
-    for prog_language in service.PROG_LANGUAGES:
-        page = 0
-        processed_jobs_offers = 0
-        amount_predicted_salary = 0
-        params = {'area':1,'text':'Программист And {0}'.format(prog_language)}
-        total_pages = get_total_hh_pages(url_template, params)
-        total_jobs_offers = get_total_hh_jobs(url_template, params)
-        while page < total_pages:
-            predict_rub_salary = predict_rub_salary_from_hh(url_template, params)
-            processed_jobs_offers += predict_rub_salary['total_processed_vacancies']
-            amount_predicted_salary += predict_rub_salary['total_predicted_salary']
-            page += 1
+    vacancies_from_hh = read_vacancies_from_hh()
+    for prog_language in vacancies_from_hh.keys():
+        predicted_salaries = [service.get_predicted_salary(item) for item in vacancies_from_hh[prog_language]]
+        processed_jobs_offers = [int(predicted_salary or 0) for predicted_salary in predicted_salaries if int(predicted_salary or 0) > 0]
+        amount_jobs_offers = len(processed_jobs_offers)
+        amount_predicted_salary = sum(processed_jobs_offers)
         try:
-            average_salary = round(amount_predicted_salary/processed_jobs_offers)
+            average_salary = round(amount_predicted_salary/amount_jobs_offers)
         except ZeroDivisionError:
-            average_salary = 0    
+            average_salary = 0
         headhunter_jobs_statistics.append({'source':'HeadHunter',
-                                        'language':prog_language,
-                                        'total':total_jobs_offers,
-                                        'total_processed':processed_jobs_offers,
-                                        'average_salary':average_salary})
-            
+                                   'language':prog_language,
+                                   'total':len(predicted_salaries),
+                                   'total_processed':amount_jobs_offers,
+                                   'average_salary':average_salary})
+
     return service.create_table_data(headhunter_jobs_statistics)

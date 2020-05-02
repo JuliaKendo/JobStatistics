@@ -19,7 +19,7 @@ def add_keywords(params, prog_language, num_of_keyword):
     for key, param in keywords_params.items():
         params[keywords_template.format(num_of_keyword, key)] = param
 
-def get_predicted_salary(currency, salary_from, salary_to):
+def calculate_predicted_salary(currency, salary_from, salary_to):
     if currency != 'RUR' and currency != 'rub':
         return None
     if int(salary_from or 0) > 0 and not salary_to:
@@ -31,6 +31,15 @@ def get_predicted_salary(currency, salary_from, salary_to):
     else:
         return 0
 
+def get_predicted_salary(item):
+    predicted_salary = None
+    try:
+        predicted_salary = calculate_predicted_salary(item['currency'],item['from'],item['to'])
+    except TypeError as error:
+        logger.error('Ошибка получения усредненной зарплаты с сайта')
+
+    return predicted_salary
+    
 def create_table_data(list_of_job_statistics):
     table_data = []
     if list_of_job_statistics:
