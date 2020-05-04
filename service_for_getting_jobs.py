@@ -4,10 +4,6 @@ import logging
 PROG_LANGUAGES = ['Python', 'Java', 'JavaScript', 'Go', 'PHP', 'C++', '1C']
 logger = logging.getLogger('statistics')
 
-def get_url(url_template):
-    url = 'https://{0}'.format(url_template)
-    return url
-
 def query_to_site(url, params, headers=None):
     response = requests.get(url, headers=headers or {}, params=params)
     response.raise_for_status()
@@ -19,7 +15,7 @@ def add_keywords(params, prog_language, num_of_keyword):
     for key, param in keywords_params.items():
         params[keywords_template.format(num_of_keyword, key)] = param
 
-def calculate_predicted_salary(currency, salary_from, salary_to):
+def calculate_predict_salary(currency, salary_from, salary_to):
     if currency != 'RUR' and currency != 'rub':
         return None
     if int(salary_from or 0) > 0 and not salary_to:
@@ -31,10 +27,10 @@ def calculate_predicted_salary(currency, salary_from, salary_to):
     else:
         return 0
 
-def get_predicted_salary(item):
+def get_predict_salary(item):
     predicted_salary = None
     try:
-        predicted_salary = calculate_predicted_salary(item['currency'],item['from'],item['to'])
+        predicted_salary = calculate_predict_salary(item['currency'],item['from'],item['to'])
     except TypeError as error:
         logger.error('Ошибка получения усредненной зарплаты с сайта')
 

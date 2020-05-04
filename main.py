@@ -18,9 +18,14 @@ def initialize_logger():
     handler.setFormatter(formatter)
     logger.addHandler(handler)
 
-def show_jobs_statistics(jobs_statistics_function, title):
+def show_jobs_statistics(jobs_statistics_function, url_header=None):
     try:
-        jobs_statistics = jobs_statistics_function()
+        if url_header:
+            title = 'SuperJob Moscow'
+            jobs_statistics = jobs_statistics_function(url_header)
+        else:
+            title = 'HeadHunter Moscow'
+            jobs_statistics = jobs_statistics_function()
     except requests.exceptions.HTTPError as error:
         logger.error('Не удалось получить данные с сайта {0}: {1}'.format(title, error))
     except (KeyError, TypeError) as error:
@@ -33,8 +38,9 @@ def main():
 
     load_dotenv()
     initialize_logger()
-    show_jobs_statistics(hh.get_vacancies_from_hh, 'HeadHunter Moscow')
-    show_jobs_statistics(sj.get_vacancies_from_sj, 'SuperJob Moscow')
+    url_header = {'X-Api-App-Id':os.environ.get('SUPERJOB_SECRETKEY')}
+    show_jobs_statistics(hh.get_vacancies_from_hh)
+    show_jobs_statistics(sj.get_vacancies_from_sj, url_header)
 
 if __name__=='__main__':
     main()
