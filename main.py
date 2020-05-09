@@ -8,15 +8,16 @@ from terminaltables import AsciiTable
 
 logger = logging.getLogger('statistics')
 
+
 def initialize_logger():
     output_dir = os.path.dirname(os.path.realpath(__file__))
     logger.setLevel(logging.DEBUG)
-     
-    handler = logging.FileHandler(os.path.join(output_dir, 'log.txt'),"a")
+    handler = logging.FileHandler(os.path.join(output_dir, 'log.txt'), "a")
     handler.setLevel(logging.DEBUG)
     formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
     handler.setFormatter(formatter)
     logger.addHandler(handler)
+
 
 def show_jobs_statistics(jobs_statistics_function, url_header=None):
     try:
@@ -34,13 +35,15 @@ def show_jobs_statistics(jobs_statistics_function, url_header=None):
         jobs_table = AsciiTable(jobs_statistics, title)
         print(jobs_table.table)
 
+
 def main():
 
     load_dotenv()
     initialize_logger()
-    url_header = {'X-Api-App-Id':os.environ.get('SUPERJOB_SECRETKEY')}
+    url_header = {'X-Api-App-Id': os.environ.get('SUPERJOB_SECRETKEY')}
     show_jobs_statistics(hh.get_vacancies_from_hh)
     show_jobs_statistics(sj.get_vacancies_from_sj, url_header)
 
-if __name__=='__main__':
+
+if __name__ == '__main__':
     main()
